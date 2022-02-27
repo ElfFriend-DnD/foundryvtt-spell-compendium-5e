@@ -11,8 +11,10 @@
 
 This module adds a variety of enhancements to the Compendium Viewer for compendia that contain only Spell type items.
 
+![image](https://user-images.githubusercontent.com/7644614/155867600-e55b39ea-22d7-4c32-9c7d-e309c7de1e4f.png)
 
 
 ## Compatibility
 
-Core 5e
+- Core 5e
+- Compendium Folders (mostly, there is a subset of functionality in spell-only compendia which have folders)
