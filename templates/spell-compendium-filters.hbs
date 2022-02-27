@@ -1,0 +1,20 @@
+<div>
+  <fieldset>
+  <legend>Spell Level</legend>
+  {{#each spellLevel as | label lvl |}}
+    <label>
+      <input type="checkbox" name="spellLevels.{{lvl}}" {{checked (lookup inputs.spellLevels lvl)}}>
+      {{label}}
+    </label>
+  {{/each}}
+  </fieldset>
+  
+  <label>School</label>
+  <label>Casting Time</label>
+  <label>Components</label>
+  <label>Damage Types</label>
+  <label>Duration</label>
+  <label>Range</label>
+  <label>Target</label>
+  <label>Save Type/Attack</label>
+</div>

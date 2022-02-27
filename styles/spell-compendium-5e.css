@@ -25,6 +25,9 @@
 }
 
 .spell-compendium-5e small {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: var(--color-text-dark-secondary);
 }
 
@@ -34,6 +37,7 @@
 
 .spell-compendium-5e .effect {
   flex: 2 1;
+  overflow: hidden;
 }
 
 .spell-compendium-5e .components {

@@ -52,8 +52,8 @@ export class SpellCompendium5eCompendium {
         <small>${game.i18n.localize('DND5E.Target')}</small>
       </div>
       <div class="effect">
-        <div>Effects</div>
-        <small>${game.i18n.localize('DND5E.Damage')}</small>
+        <div>${game.i18n.localize('DND5E.Effects')}</div>
+        <small>${game.i18n.localize('DND5E.Damage')} & ${game.i18n.localize('DOCUMENT.ActiveEffects')}</small>
       </div>
     </div>
   `);
@@ -98,17 +98,18 @@ export class SpellCompendium5eCompendium {
    * @param {*} listItem
    * @param {*} indexEntry
    */
-  addContentToListItem(listItem, { data }) {
+  addContentToListItem(listItem, indexData) {
     const {
       levelLabel,
       componentsLabel,
+      componentsSpecialLabel,
       actionTypeLabel,
       activationTimeLabel,
-      damageTypeLabel,
+      effectTypeLabel,
       durationLabel,
       rangeLabel,
       targetLabel
-    } = new SpellCompendium5eCompendiumItem(data);
+    } = new SpellCompendium5eCompendiumItem(indexData);
 
     // Add Level and School to document-name
     const levelContent = document.createTextNode(levelLabel);
@@ -117,18 +118,21 @@ export class SpellCompendium5eCompendium {
     listItem.querySelector('.document-name').append(levelNode);
 
     const node = document.createRange().createContextualFragment(`
-        <div class="components">${componentsLabel}</div>
+        <div class="components">
+          <div>${componentsLabel}</div>
+          <small title="${indexData.data.materials.consumed ? game.i18n.localize('DND5E.Consumed') : ''}">${componentsSpecialLabel}</small>
+        </div>
         <div class="activation">
           <div>${activationTimeLabel}</div>
           <small>${durationLabel}</small>
         </div>
         <div  class="range">
           <div>${rangeLabel}</div>
-          <small>${targetLabel}</small>
+          <small title="${targetLabel}">${targetLabel}</small>
         </div>
         <div class="effect">
           <div>${actionTypeLabel}</div>
-          <small>${damageTypeLabel}</small>
+          <small title="${effectTypeLabel}">${effectTypeLabel}</small>
         </div>
     `)
 
@@ -140,7 +144,6 @@ export class SpellCompendium5eCompendium {
    * Only runs if there are no folders in the compendium
    */
   handleSort() {
-
     // Only sort if the compendium does not have folders.
     if (this.compendiumHasFolders) {
       return;
@@ -183,9 +186,7 @@ export class SpellCompendium5eCompendium {
       this.addContentToListItem(listItemElement, relevantIndexEntry);
     });
 
-
     this.html.querySelector('.directory-header')?.after(this.listHeadingElement);
-
   }
 
   static init() {

@@ -2,8 +2,9 @@
  * Class which replicates a lot of the item label logic native to 5e
  */
 export class SpellCompendium5eCompendiumItem {
-  constructor(indexData) {
-    this.data = indexData;
+  constructor({data, effects}) {
+    this.data = data;
+    this.effects = effects;
   }
 
   /** Spell Level and School */
@@ -45,6 +46,17 @@ export class SpellCompendium5eCompendiumItem {
       arr.push(c[0].titleCase().slice(0, 1));
       return arr;
     }, []);
+  }
+
+  /** Components  */
+  get componentsSpecialLabel() {
+    return [
+      this.data.materials.cost ? `${this.data.materials.cost}` : null,
+      this.data.materials.cost ? `${CONFIG.DND5E.currencies.gp?.abbreviation}` : null,
+      this.data.materials.consumed ? 
+        (this.data.materials.cost ? '*' : game.i18n.localize('DND5E.Consumed'))
+        : null
+    ].filterJoin('')
   }
 
   /** Casting Time */
@@ -103,5 +115,14 @@ export class SpellCompendium5eCompendiumItem {
       )
     ).values()].join(", ");
   }
+
+  get effectTypeLabel() {
+
+    const effectLabel = this.effects.length ? game.i18n.localize('DOCUMENT.ActiveEffects') : null;
+
+    return [this.damageTypeLabel, effectLabel].filterJoin(", ");
+
+  }
+  
 }
 
