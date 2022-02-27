@@ -37,22 +37,33 @@ class SpellCompendium5eCompendium {
   
   
     // Components
-    const attributes = {
-      ...CONFIG.DND5E.spellComponents,
-      ...Object.fromEntries(Object.entries(CONFIG.DND5E.spellTags).map(([k, v]) => {
-        v.tag = true;
-        return [k, v];
-      }))
-    };
-  
-    const componentsArray = Object.entries(data.components).map(([component, active]) => {
-      const config = attributes[component];
-      if ( !config || (active !== true) ) return;
-      return config.abbr;
-    }).filter(val => !!val);
-  
-    const componentsLabel = new Intl.ListFormat(game.i18n.lang, { style: "narrow", type: "conjunction" }).format(componentsArray);
-  
+
+    let componentsLabel;
+
+    if (CONFIG.DND5E.spellTags) {
+      const attributes = {
+        ...CONFIG.DND5E.spellComponents,
+        ...Object.fromEntries(Object.entries(CONFIG.DND5E.spellTags).map(([k, v]) => {
+          v.tag = true;
+          return [k, v];
+        }))
+      };
+    
+      const componentsArray = Object.entries(data.components).map(([component, active]) => {
+        const config = attributes[component];
+        if ( !config || (active !== true) ) return;
+        return config.abbr;
+      }).filter(val => !!val);
+    
+      componentsLabel = new Intl.ListFormat(game.i18n.lang, { style: "narrow", type: "conjunction" }).format(componentsArray);
+    } else {
+      componentsLabel = Object.entries(data.components).reduce((arr, c) => {
+        if ( c[1] !== true ) return arr;
+        arr.push(c[0].titleCase().slice(0, 1));
+        return arr;
+      }, []);
+    }
+
   
     // Casting Time
   
@@ -132,8 +143,6 @@ class SpellCompendium5eCompendium {
     `)
   
     listItem.append(node);
-  
-    // listItem.append(...[componentsNode, activationDurationNode, rangeTargetNode, actionTypeNode, damageTypeNode]);
   }
 
   static renderListHeading() {
