@@ -21,6 +21,11 @@
 .spell-compendium-5e .document-name a {
   text-overflow: ellipsis;
   overflow: hidden;
+  font-weight: bold;
+}
+
+.spell-compendium-5e small {
+  color: var(--color-text-dark-secondary);
 }
 
 .spell-compendium-5e .document-img {
