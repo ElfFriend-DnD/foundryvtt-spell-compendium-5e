@@ -1,0 +1,69 @@
+.spell-compendium-5e {
+  width: 600px !important;
+}
+
+.spell-compendium-5e .list-heading {
+  flex: 0;
+  align-items: center;
+}
+
+.spell-compendium-5e .directory-item {
+  line-height: normal !important;
+  align-items: center;
+}
+
+.spell-compendium-5e .document-name {
+  flex: 2 0;
+  margin: 0 !important;
+  min-width: 20ch;
+}
+
+.spell-compendium-5e .document-name a {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.spell-compendium-5e .document-img {
+  flex: 0 0 var(--sidebar-item-height);
+}
+
+.spell-compendium-5e .effect {
+  flex: 2 1;
+}
+
+.spell-compendium-5e .components {
+  flex: 1 0;
+  min-width: 10ch;
+}
+
+.spell-compendium-5e .activation {
+  flex: 1 0;
+  min-width: 10ch;
+}
+
+.spell-compendium-5e .range {
+  flex: 1 0;
+  min-width: 10ch;
+}
+
+.spell-compendium-5e .list-heading,
+.spell-compendium-5e .directory-item {
+  gap: 0.5em;
+}
+
+.spell-compendium-5e .document-name,
+.spell-compendium-5e .activation,
+.spell-compendium-5e .range,
+.spell-compendium-5e .effect {
+  display: flex;
+  flex-direction: column;
+}
+
+.spell-compendium-5e .document-img,
+.spell-compendium-5e .components,
+.spell-compendium-5e .activation,
+.spell-compendium-5e .range,
+.spell-compendium-5e .effect {
+  text-align: center;
+}
+
