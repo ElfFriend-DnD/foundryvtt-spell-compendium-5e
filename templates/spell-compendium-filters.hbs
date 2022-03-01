@@ -1,20 +1,72 @@
-<div>
-  <fieldset>
-  <legend>Spell Level</legend>
-  {{#each spellLevel as | label lvl |}}
+  <form class="filters">
+    <fieldset>
+      <legend>{{localize 'DND5E.SpellLevel'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <div class="filter-grid">
+        {{#each config.spellLevels as | label lvl |}}
+        <label>
+          <input type="checkbox" name="level.{{lvl}}" {{checked (lookup @root/inputs.level lvl)}}>
+          {{label}}
+        </label>
+        {{/each}}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{localize 'DND5E.SpellSchool'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <div class="filter-grid">
+        {{#each config.spellSchools as | label abbrev |}}
+        <label>
+          <input type="checkbox" name="school.{{abbrev}}" {{checked (lookup @root/inputs.school abbrev)}}>
+          {{label}}
+        </label>
+        {{/each}}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{localize 'DND5E.ItemActivationCost'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <div class="filter-grid">
+        {{#each config.spellActivationTypes as | label abbrev |}}
+        <label>
+          <input type="checkbox" name="activation.type.{{abbrev}}" {{checked (lookup @root/inputs.activation.type
+            abbrev)}}>
+          {{label}}
+        </label>
+        {{/each}}
+      </div>
+    </fieldset>
+
+    <!--<fieldset>
+  <legend>{{localize 'DND5E.SpellComponents'}}</legend>
+  {{#each config.spellComponentTypes as | label type |}}
     <label>
-      <input type="checkbox" name="spellLevels.{{lvl}}" {{checked (lookup inputs.spellLevels lvl)}}>
+      <input type="checkbox" name="components.{{type}}" {{checked (lookup @root/inputs.components type)}}>
       {{label}}
     </label>
   {{/each}}
-  </fieldset>
-  
-  <label>School</label>
-  <label>Casting Time</label>
-  <label>Components</label>
-  <label>Damage Types</label>
-  <label>Duration</label>
-  <label>Range</label>
-  <label>Target</label>
-  <label>Save Type/Attack</label>
-</div>
+  </fieldset>-->
+
+    <fieldset>
+      <legend>{{localize 'Spell Tags'}} ({{localize 'spell-compendium-5e.AND'}})</legend>
+      <div class="filter-grid">
+        {{#each config.spellTagTypes as | label type |}}
+        <label>
+          <input type="checkbox" name="components.{{type}}" {{checked (lookup @root/inputs.components type)}}>
+          {{label}}
+        </label>
+        {{/each}}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{localize 'DND5E.Damage'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <div class="filter-grid">
+        {{#each config.damageTypes as | label type |}}
+        <label>
+          <input type="checkbox" name="damage.parts.{{type}}" {{checked (lookup @root/inputs.damage.parts type)}}>
+          {{label}}
+        </label>
+        {{/each}}
+      </div>
+    </fieldset>
+  </form>

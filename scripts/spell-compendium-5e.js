@@ -4,6 +4,11 @@ export class SpellCompendium5e {
   static MODULE_NAME = "spell-compendium-5e";
   static MODULE_TITLE = "Spell Compendium DnD5e";
 
+  static TEMPLATES = {
+    filters: `modules/${this.MODULE_NAME}/templates/spell-compendium-filters.hbs`,
+    header: `modules/${this.MODULE_NAME}/templates/spell-compendium-header.hbs`,
+  }
+
   static log(...args) {
     if (game.modules.get('_dev-mode')?.api?.getPackageDebugValue(this.MODULE_NAME)) {
       console.log(this.MODULE_TITLE, '|', ...args);

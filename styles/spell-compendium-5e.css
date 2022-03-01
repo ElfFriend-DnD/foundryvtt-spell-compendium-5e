@@ -1,10 +1,64 @@
 .spell-compendium-5e {
-  width: 600px !important;
+  width: calc(36ch + 600px + 1em) !important;
+}
+
+.spell-compendium-5e .compendium {
+  display: grid;
+  grid-template-columns: 36ch 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+      'filters header'
+      'filters content';
+  gap: 0.5em 1em;
+}
+
+
+.spell-compendium-5e .directory-header {
+  line-height: normal !important;
+  grid-area: filters;
+  gap: 1em;
+}
+
+.spell-compendium-5e .directory-header .header-search {
+  flex: 0 0;
+}
+
+.spell-compendium-5e .filters {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.spell-compendium-5e .filter-grid {
+  column-count: 2;
+}
+
+.spell-compendium-5e .filter-grid label {
+  display: block;
+}
+
+.spell-compendium-5e input[type='checkbox'] {
+  flex: 0 0 1em;
+  width: 1em;
+  height: 1em;
+  margin: 0;
 }
 
 .spell-compendium-5e .list-heading {
+  grid-area: header;
   flex: 0;
   align-items: center;
+  box-shadow: 0 ;
+}
+
+.spell-compendium-5e .header-search input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.spell-compendium-5e .directory-list {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 20px 16px -20px inset;
 }
 
 .spell-compendium-5e .directory-item {

@@ -1,8 +1,10 @@
+//@ts-check
 /**
  * Class which replicates a lot of the item label logic native to 5e
  */
 export class SpellCompendium5eCompendiumItem {
-  constructor({data, effects}) {
+  constructor(listItemElement, {data, effects}) {
+    this.listItemElement = listItemElement;
     this.data = data;
     this.effects = effects;
   }
@@ -116,12 +118,55 @@ export class SpellCompendium5eCompendiumItem {
     ).values()].join(", ");
   }
 
+  /** Damage Type + Active Effects */
   get effectTypeLabel() {
-
     const effectLabel = this.effects.length ? game.i18n.localize('DOCUMENT.ActiveEffects') : null;
 
     return [this.damageTypeLabel, effectLabel].filterJoin(", ");
+  }
 
+  /**
+   * Appends spell details to this list item
+   */
+   addContentToListItem() {
+    const {
+      levelLabel,
+      componentsLabel,
+      componentsSpecialLabel,
+      actionTypeLabel,
+      activationTimeLabel,
+      effectTypeLabel,
+      durationLabel,
+      rangeLabel,
+      targetLabel
+    } = this;
+
+    // Add Level and School to document-name
+    const levelContent = document.createTextNode(levelLabel);
+    const levelNode = document.createElement('small')
+    levelNode.appendChild(levelContent);
+    this.listItemElement.querySelector('.document-name').append(levelNode);
+
+    const node = document.createRange().createContextualFragment(`
+        <div class="components">
+          <div>${componentsLabel}</div>
+          <small title="${this.data.materials.consumed ? game.i18n.localize('DND5E.Consumed') : ''}">${componentsSpecialLabel}</small>
+        </div>
+        <div class="activation">
+          <div>${activationTimeLabel}</div>
+          <small>${durationLabel}</small>
+        </div>
+        <div  class="range">
+          <div>${rangeLabel}</div>
+          <small title="${targetLabel}">${targetLabel}</small>
+        </div>
+        <div class="effect">
+          <div>${actionTypeLabel}</div>
+          <small title="${effectTypeLabel}">${effectTypeLabel}</small>
+        </div>
+    `)
+
+    this.listItemElement.append(node);
   }
   
 }

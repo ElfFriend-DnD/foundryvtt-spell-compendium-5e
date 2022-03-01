@@ -1,3 +1,5 @@
+//@ts-check
+import { SpellCompendium5e } from "../spell-compendium-5e.js";
 import { SpellCompendium5eCompendiumItem } from "./compendium-item.js";
 
 /**
@@ -35,28 +37,8 @@ export class SpellCompendium5eCompendium {
   /**
    * A static element placed at the heading of the list
    */
-  listHeadingElement = document.createRange().createContextualFragment(`
-    <div class="list-heading flexrow">
-      <div class="document-img"><i class="fas fa-image"></i></div>
-      <div class="document-name">
-        <strong>${game.i18n.localize('DND5E.ItemName')}</strong>
-        <small>${game.i18n.localize('DND5E.SpellLevel')} & ${game.i18n.localize('DND5E.SpellSchool')}</small>
-      </div>
-      <div class="components">${game.i18n.localize('DND5E.SpellComponents')}</div>
-      <div class="activation">
-        <div>${game.i18n.localize('DND5E.ItemActivationCost')}</div>
-        <small>${game.i18n.localize('DND5E.Duration')}</small>
-      </div>
-      <div class="range">
-        <div>${game.i18n.localize('DND5E.Range')}</div>
-        <small>${game.i18n.localize('DND5E.Target')}</small>
-      </div>
-      <div class="effect">
-        <div>${game.i18n.localize('DND5E.Effects')}</div>
-        <small>${game.i18n.localize('DND5E.Damage')} & ${game.i18n.localize('DOCUMENT.ActiveEffects')}</small>
-      </div>
-    </div>
-  `);
+  _listHeadingElement = null;
+
 
   get compendiumHasFolders() {
     return this.collection.index.some(({ name }) => name === '#[CF_tempEntity]');
@@ -70,12 +52,64 @@ export class SpellCompendium5eCompendium {
     return this.html.querySelectorAll('.directory-list .directory-item');
   }
 
+  get filterFormElement() {
+    return this.html.querySelector('.filters');
+  }
 
   /**
    * A cached property for obtaining the new index with all our required fields
    */
   get newIndex() {
     return this._newIndex;
+  }
+
+  /**
+   * A cached property for obtaining the new index with all our required fields
+   */
+  get listHeadingElement() {
+    return this._listHeadingElement;
+  }
+
+  get spellActivationTypes() {
+    return Object.fromEntries(
+      Object.entries(CONFIG.DND5E.abilityActivationTypes).filter(
+        ([abbrev, label]) => ['bonus', 'action', 'reaction', 'minute', 'hour', 'day'].includes(abbrev)
+      )
+    );
+  }
+
+  get spellComponentTypes() {
+    return {
+      vocal: game.i18n.localize('DND5E.ComponentVerbal'),
+      somatic: game.i18n.localize('DND5E.ComponentSomatic'),
+      material: game.i18n.localize('DND5E.ComponentMaterial'),
+    }
+    // Object.values(CONFIG.DND5E.spellComponents).reduce((acc, label) => {
+    //   acc[label.toLowerCase()] = label;
+    //   return acc;
+    // }, {});
+  }
+
+  get spellTagTypes() {
+    const tags = {
+      ritual: game.i18n.localize('DND5E.Ritual'),
+      concentration: game.i18n.localize('DND5E.Concentration')
+    }
+
+    return tags;
+  }
+
+
+  get defaultInputsValues() {
+    SpellCompendium5e.log('this.spellActivationTypes', this.spellActivationTypes)
+
+    return {
+      level: Object.keys(CONFIG.DND5E.spellLevels).reduce((acc, key) => { acc[key] = true; return acc }, {}),
+      school: Object.keys(CONFIG.DND5E.spellSchools).reduce((acc, key) => { acc[key] = true; return acc }, {}),
+      activation: {
+        type: Object.keys(this.spellActivationTypes).reduce((acc, key) => { acc[key] = true; return acc }, {}),
+      }
+    }
   }
 
   /**
@@ -94,49 +128,11 @@ export class SpellCompendium5eCompendium {
   }
 
   /**
-   * Appends spell details to the List Item element provided.
-   * @param {*} listItem
-   * @param {*} indexEntry
+   * Get the list heading element from our template
    */
-  addContentToListItem(listItem, indexData) {
-    const {
-      levelLabel,
-      componentsLabel,
-      componentsSpecialLabel,
-      actionTypeLabel,
-      activationTimeLabel,
-      effectTypeLabel,
-      durationLabel,
-      rangeLabel,
-      targetLabel
-    } = new SpellCompendium5eCompendiumItem(indexData);
-
-    // Add Level and School to document-name
-    const levelContent = document.createTextNode(levelLabel);
-    const levelNode = document.createElement('small')
-    levelNode.appendChild(levelContent);
-    listItem.querySelector('.document-name').append(levelNode);
-
-    const node = document.createRange().createContextualFragment(`
-        <div class="components">
-          <div>${componentsLabel}</div>
-          <small title="${indexData.data.materials.consumed ? game.i18n.localize('DND5E.Consumed') : ''}">${componentsSpecialLabel}</small>
-        </div>
-        <div class="activation">
-          <div>${activationTimeLabel}</div>
-          <small>${durationLabel}</small>
-        </div>
-        <div  class="range">
-          <div>${rangeLabel}</div>
-          <small title="${targetLabel}">${targetLabel}</small>
-        </div>
-        <div class="effect">
-          <div>${actionTypeLabel}</div>
-          <small title="${effectTypeLabel}">${effectTypeLabel}</small>
-        </div>
-    `)
-
-    listItem.append(node);
+  async _getListHeadingElement() {
+    const element = await renderTemplate(SpellCompendium5e.TEMPLATES.header);
+    return this._listHeadingElement = document.createRange().createContextualFragment(element);
   }
 
   /**
@@ -160,6 +156,148 @@ export class SpellCompendium5eCompendium {
   }
 
   /**
+   * Converts an object of objects who end up in `key: bool` to instead be objects with arrays of only true values at the end
+   */
+  _recursiveConvertToArrays(object) {
+    return Object.fromEntries(
+      Object.entries(object).map(([key, value]) => {
+        let newVal;
+        if (Object.values(value).some(subValue => typeof subValue !== 'boolean')) {
+          newVal = this._recursiveConvertToArrays(value);
+        } else {
+          newVal = Object.keys(value).filter((key) => value[key]);
+        }
+        return [key, newVal]
+      })
+    )
+  }
+
+  getFilterValues(filterForm) {
+    const formData = new FormDataExtended(filterForm).toObject();
+
+    const formDataExpanded = foundry.utils.expandObject(formData);
+
+    const selectedKeys = this._recursiveConvertToArrays(formDataExpanded);
+
+    return selectedKeys;
+  }
+
+  /**
+   * Filter the List Item elements based on active filter selections
+   */
+  handleFilter() {
+    if (!this.filterFormElement) {
+      SpellCompendium5e.log('No form element');
+      return;
+    }
+
+    const values = this.getFilterValues(this.filterFormElement);
+
+    const flatValues = foundry.utils.flattenObject(values);
+
+    if (Object.values(flatValues).some((val) => val.length)) {
+      this.html.querySelector('input[name="search"]').disabled = true;
+    } else {
+      this.html.querySelector('input[name="search"]').disabled = false;
+    }
+
+    SpellCompendium5e.log('Form Values', values);
+
+    this.listItemElements.forEach((listItemElement) => {
+      const itemId = listItemElement.dataset.documentId;
+      const relevantIndexEntry = this.newIndex.get(itemId);
+
+      if (relevantIndexEntry.type !== 'spell') {
+        return;
+      }
+
+      const { data } = relevantIndexEntry;
+
+
+      const firstFailedTest = Object.entries(flatValues).find(
+        // Return True to filter this item out
+        ([path, includedValues]) => {
+
+          const relevantValue = foundry.utils.getProperty(data, path);
+
+          if (relevantValue === undefined) {
+            return true;
+          }
+
+          switch(path) {
+            case 'components': {
+              if (!includedValues.length) {
+                return false;
+              }
+              // relevantValue[componentType] is expected to be a boolean
+              return includedValues.some((componentType) => !relevantValue[componentType]);
+            }
+
+            case 'damage.parts': {
+              if (!includedValues.length) {
+                return false;
+              }
+
+              return !includedValues.some((damageType) => relevantValue.some(([formula, type]) => type === damageType));
+            }
+
+            default: {
+              if (!includedValues.length) {
+                return false;
+              }
+
+              // sometimes level is a string...
+              return !includedValues.includes(
+                String(relevantValue)
+              )
+            }
+          }
+
+        }
+      )
+
+      SpellCompendium5e.log(!!firstFailedTest ? 'excluded' : 'included', relevantIndexEntry.name, {
+        firstFailedTest,
+        data,
+        values,
+      })
+
+      if (!!firstFailedTest) {
+        listItemElement.style.display = 'none';
+      } else {
+        listItemElement.style.display = 'flex';
+      }
+
+    });
+  }
+
+  /**
+   * Renders a bunch of filters at the top of the display.
+   */
+  async renderFilters() {
+    const config = {
+      ...CONFIG.DND5E,
+      spellActivationTypes: this.spellActivationTypes,
+      spellComponentTypes: this.spellComponentTypes,
+      spellTagTypes: this.spellTagTypes,
+    }
+
+    const element = await renderTemplate(SpellCompendium5e.TEMPLATES.filters, {
+      config,
+      inputs: {},
+    });
+
+    const node = document.createRange().createContextualFragment(element);
+
+    const directoryHeader = this.html.querySelector('.directory-header');
+
+
+    directoryHeader?.classList?.remove('flexrow');
+    directoryHeader?.classList?.add('flexcol');
+    directoryHeader?.appendChild(node);
+  }
+
+  /**
    * The main entry point for this process.
    * Handles any changes to the compendium display
    */
@@ -168,10 +306,18 @@ export class SpellCompendium5eCompendium {
       await this._getNewIndex();
     }
 
+    if (this.listHeadingElement === null) {
+      await this._getListHeadingElement();
+    }
+
     // add our class to the outer element if it is not already there
     if (!this.rootElement.classList.contains('spell-compendium-5e')) {
       this.rootElement.classList.add('spell-compendium-5e');
     }
+
+    await this.renderFilters();
+
+    this.handleFilter();
 
     this.handleSort();
 
@@ -183,10 +329,21 @@ export class SpellCompendium5eCompendium {
         return;
       }
 
-      this.addContentToListItem(listItemElement, relevantIndexEntry);
+      new SpellCompendium5eCompendiumItem(listItemElement, relevantIndexEntry).addContentToListItem();
     });
 
     this.html.querySelector('.directory-header')?.after(this.listHeadingElement);
+
+    this.activateFilterListeners();
+  }
+
+  activateFilterListeners() {
+    $(this.filterFormElement).on('input', 'input', (event) => {
+      SpellCompendium5e.log('filter changed', event.currentTarget);
+      event.stopPropagation();
+
+      this.handleFilter();
+    });
   }
 
   static init() {
