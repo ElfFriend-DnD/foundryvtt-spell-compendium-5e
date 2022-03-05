@@ -2,7 +2,7 @@
   "name": "spell-compendium-5e",
   "title": "Spell Compendium DnD5e",
   "description": "A module which enhances 5e spellbook compendiums with useful information and filters.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Andrew Krigline",
   "authors": [
     {
