@@ -11,10 +11,15 @@
 
 This module adds a variety of enhancements to the Compendium Viewer for compendia that contain only Spell type items.
 
-![image](https://user-images.githubusercontent.com/7644614/155867600-e55b39ea-22d7-4c32-9c7d-e309c7de1e4f.png)
+![image](https://user-images.githubusercontent.com/7644614/156891839-0df40248-37e7-4d6a-8879-c765bd3729f2.png)
 
 
 ## Compatibility
 
 - Core 5e
 - Compendium Folders (mostly, there is a subset of functionality in spell-only compendia which have folders)
+
+## Notes about performance
+Each compendium is purposefully treated separately, I will not be considering any enhancements which involve searching or displaying the contents of multiple compendia at once with this module. This is largely due to performance concerns.
+
+This module leverages the Foundry Core compendium `index` instead of loading all of the data for a given compendium on load. As a result, the first time a spell compendium is opened per session might take a hot second to load, but will be faster after that first time. This carries very little risk of overloading your server's memory usage as well.
