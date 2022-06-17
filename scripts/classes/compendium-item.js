@@ -1,4 +1,6 @@
 //@ts-check
+import { SpellCompendium5e } from "../spell-compendium-5e.js";
+
 /**
  * Class which replicates a lot of the item label logic native to 5e
  */
@@ -12,8 +14,8 @@ export class SpellCompendium5eCompendiumItem {
   /** Spell Level and School */
   get levelLabel() {
     const levelLabelParts = [
-      CONFIG.DND5E.spellLevels[this.data.level],
-      CONFIG.DND5E.spellSchools[this.data.school]
+      SpellCompendium5e.SPELLCONFIG("Levels")[this.data.level],
+      SpellCompendium5e.SPELLCONFIG("Schools")[this.data.school]
     ]
 
     if (this.data.level === 0) {
@@ -25,10 +27,10 @@ export class SpellCompendium5eCompendiumItem {
 
   /** Components */
   get componentsLabel() {
-    if (CONFIG.DND5E.spellTags) {
+    if (SpellCompendium5e.SPELLCONFIG("Tags")) {
       const attributes = {
-        ...CONFIG.DND5E.spellComponents,
-        ...Object.fromEntries(Object.entries(CONFIG.DND5E.spellTags).map(([k, v]) => {
+        ...SpellCompendium5e.SPELLCONFIG("Components"),
+        ...Object.fromEntries(Object.entries(SpellCompendium5e.SPELLCONFIG("Tags")).map(([k, v]) => {
           v.tag = true;
           return [k, v];
         }))
@@ -54,9 +56,9 @@ export class SpellCompendium5eCompendiumItem {
   get componentsSpecialLabel() {
     return [
       this.data.materials.cost ? `${this.data.materials.cost}` : null,
-      this.data.materials.cost ? `${CONFIG.DND5E.currencies.gp?.abbreviation}` : null,
+      this.data.materials.cost ? `${SpellCompendium5e.CONFIG.currencies.gp?.abbreviation}` : null,
       this.data.materials.consumed ? 
-        (this.data.materials.cost ? '*' : game.i18n.localize('DND5E.Consumed'))
+        (this.data.materials.cost ? '*' : game.i18n.localize(`${SpellCompendium5e.SYSTEM}.Consumed`))
         : null
     ].filterJoin('')
   }
@@ -65,7 +67,7 @@ export class SpellCompendium5eCompendiumItem {
   get activationTimeLabel() {
     return [
       ['action', 'bonus', 'reaction', 'special'].includes(this.data.activation.type) ? null : this.data.activation.cost,
-      CONFIG.DND5E.abilityActivationTypes[this.data.activation.type]
+      SpellCompendium5e.CONFIG.abilityActivationTypes[this.data.activation.type]
     ].filterJoin(" ")
   }
 
@@ -73,7 +75,7 @@ export class SpellCompendium5eCompendiumItem {
   get durationLabel() {
     return [
       ["inst", "perm"].includes(this.data.duration.units) ? null : this.data.duration.value,
-      CONFIG.DND5E.timePeriods[this.data.duration.units]
+      SpellCompendium5e.CONFIG.timePeriods[this.data.duration.units]
     ].filterJoin(" ");
   }
 
@@ -82,7 +84,7 @@ export class SpellCompendium5eCompendiumItem {
     return [
       this.data.range.value,
       this.data.range.long ? `/ ${this.data.range.long}` : null,
-      CONFIG.DND5E.distanceUnits[this.data.range.units]
+      SpellCompendium5e.CONFIG.distanceUnits[this.data.range.units]
     ].filterJoin(" ");
   }
 
@@ -90,8 +92,8 @@ export class SpellCompendium5eCompendiumItem {
   get targetLabel() {
     return [
       (["none", "touch", "self"].includes(this.data.target.units) || ["none", "self"].includes(this.data.target.type)) ? null : this.data.target.value,
-      ["none", "self"].includes(this.data.target.type) ? null : CONFIG.DND5E.distanceUnits[this.data.target.units],
-      CONFIG.DND5E.targetTypes[this.data.target.type]
+      ["none", "self"].includes(this.data.target.type) ? null : SpellCompendium5e.CONFIG.distanceUnits[this.data.target.units],
+      SpellCompendium5e.CONFIG.targetTypes[this.data.target.type]
     ].filterJoin(" ");
   }
 
@@ -99,13 +101,13 @@ export class SpellCompendium5eCompendiumItem {
   get actionTypeLabel() {
     if (this.data.actionType === 'save') {
       return [
-        CONFIG.DND5E.abilityAbbreviations[this.data.save.ability]?.toUpperCase(),
-        game.i18n.localize('DND5E.ActionSave')
+        SpellCompendium5e.CONFIG.abilityAbbreviations[this.data.save.ability]?.toUpperCase(),
+        game.i18n.localize(`${SpellCompendium5e.SYSTEM}.ActionSave`)
       ].filterJoin(' ');
     }
 
     return [
-      CONFIG.DND5E.itemActionTypes[this.data.actionType],
+      SpellCompendium5e.CONFIG.itemActionTypes[this.data.actionType],
     ].filterJoin(" ");
   }
 
@@ -113,7 +115,7 @@ export class SpellCompendium5eCompendiumItem {
   get damageTypeLabel() {
     return [...new Set(
       this.data.damage.parts.map(
-        ([formula, type]) => CONFIG.DND5E.damageTypes[type]
+        ([formula, type]) => SpellCompendium5e.CONFIG.damageTypes[type]
       )
     ).values()].join(", ");
   }
@@ -150,7 +152,7 @@ export class SpellCompendium5eCompendiumItem {
     const node = document.createRange().createContextualFragment(`
         <div class="components">
           <div>${componentsLabel}</div>
-          <small title="${this.data.materials.consumed ? game.i18n.localize('DND5E.Consumed') : ''}">${componentsSpecialLabel}</small>
+          <small title="${this.data.materials.consumed ? game.i18n.localize(`${SpellCompendium5e.SYSTEM}.Consumed`) : ''}">${componentsSpecialLabel}</small>
         </div>
         <div class="activation">
           <div>${activationTimeLabel}</div>

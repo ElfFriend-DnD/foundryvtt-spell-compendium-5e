@@ -72,7 +72,7 @@ export class SpellCompendium5eCompendium {
 
   get spellActivationTypes() {
     return Object.fromEntries(
-      Object.entries(CONFIG.DND5E.abilityActivationTypes).filter(
+      Object.entries(SpellCompendium5e.CONFIG.abilityActivationTypes).filter(
         ([abbrev, label]) => ['bonus', 'action', 'reaction', 'minute', 'hour', 'day'].includes(abbrev)
       )
     );
@@ -80,11 +80,11 @@ export class SpellCompendium5eCompendium {
 
   get spellComponentTypes() {
     return {
-      vocal: game.i18n.localize('DND5E.ComponentVerbal'),
-      somatic: game.i18n.localize('DND5E.ComponentSomatic'),
-      material: game.i18n.localize('DND5E.ComponentMaterial'),
+      vocal: game.i18n.localize(`${SpellCompendium5e.SYSTEM}.ComponentVerbal`),
+      somatic: game.i18n.localize(`${SpellCompendium5e.SYSTEM}.ComponentSomatic`),
+      material: game.i18n.localize(`${SpellCompendium5e.SYSTEM}.ComponentMaterial`),
     }
-    // Object.values(CONFIG.DND5E.spellComponents).reduce((acc, label) => {
+    // Object.values(SpellCompendium5e.SPELLCONFIG("Components")]).reduce((acc, label) => {
     //   acc[label.toLowerCase()] = label;
     //   return acc;
     // }, {});
@@ -92,8 +92,8 @@ export class SpellCompendium5eCompendium {
 
   get spellTagTypes() {
     const tags = {
-      ritual: game.i18n.localize('DND5E.Ritual'),
-      concentration: game.i18n.localize('DND5E.Concentration')
+      ritual: game.i18n.localize(`${SpellCompendium5e.SYSTEM}.Ritual`),
+      concentration: game.i18n.localize(`${SpellCompendium5e.SYSTEM}.Concentration`)
     }
 
     return tags;
@@ -104,8 +104,8 @@ export class SpellCompendium5eCompendium {
     SpellCompendium5e.log('this.spellActivationTypes', this.spellActivationTypes)
 
     return {
-      level: Object.keys(CONFIG.DND5E.spellLevels).reduce((acc, key) => { acc[key] = true; return acc }, {}),
-      school: Object.keys(CONFIG.DND5E.spellSchools).reduce((acc, key) => { acc[key] = true; return acc }, {}),
+      level: Object.keys(SpellCompendium5e.SPELLCONFIG("Levels")).reduce((acc, key) => { acc[key] = true; return acc }, {}),
+      school: Object.keys(SpellCompendium5e.SPELLCONFIG("Schools")).reduce((acc, key) => { acc[key] = true; return acc }, {}),
       activation: {
         type: Object.keys(this.spellActivationTypes).reduce((acc, key) => { acc[key] = true; return acc }, {}),
       }
@@ -131,7 +131,21 @@ export class SpellCompendium5eCompendium {
    * Get the list heading element from our template
    */
   async _getListHeadingElement() {
-    const element = await renderTemplate(SpellCompendium5e.TEMPLATES.header);
+    const config = {
+      localize: {
+        itemName: `${SpellCompendium5e.SYSTEM}.ItemName`,
+        spellLevel: `${SpellCompendium5e.SYSTEM}.${SpellCompendium5e.Spell}Level`,
+        spellSchool: `${SpellCompendium5e.SYSTEM}.${SpellCompendium5e.Spell}School`,
+        spellComponents: `${SpellCompendium5e.SYSTEM}.${SpellCompendium5e.Spell}Components`,
+        itemActivationCost: `${SpellCompendium5e.SYSTEM}.ItemActivationCost`,
+        duration: `${SpellCompendium5e.SYSTEM}.Duration`,
+        range: `${SpellCompendium5e.SYSTEM}.Range`,
+        target: `${SpellCompendium5e.SYSTEM}.Target`,
+        effects: `${SpellCompendium5e.SYSTEM}.Effects`,
+        damage: `${SpellCompendium5e.SYSTEM}.Damage`,
+      },
+    }
+    const element = await renderTemplate(SpellCompendium5e.TEMPLATES.header, {config});
     return this._listHeadingElement = document.createRange().createContextualFragment(element);
   }
 
@@ -207,7 +221,7 @@ export class SpellCompendium5eCompendium {
       const itemId = listItemElement.dataset.documentId;
       const relevantIndexEntry = this.newIndex.get(itemId);
 
-      if (relevantIndexEntry.type !== 'spell') {
+      if (relevantIndexEntry.type !== SpellCompendium5e.spell) {
         return;
       }
 
@@ -276,10 +290,22 @@ export class SpellCompendium5eCompendium {
    */
   async renderFilters() {
     const config = {
-      ...CONFIG.DND5E,
+      ...SpellCompendium5e.CONFIG,
       spellActivationTypes: this.spellActivationTypes,
       spellComponentTypes: this.spellComponentTypes,
       spellTagTypes: this.spellTagTypes,
+      spellLevels: SpellCompendium5e.SPELLCONFIG("Levels"),
+      spellSchools: SpellCompendium5e.SPELLCONFIG("Schools"),
+      localize: {
+        spellLevel: `${SpellCompendium5e.SYSTEM}.${SpellCompendium5e.Spell}Level`,
+        spellSchool: `${SpellCompendium5e.SYSTEM}.${SpellCompendium5e.Spell}School`,
+        itemActivationCost: `${SpellCompendium5e.SYSTEM}.ItemActivationCost`,
+        spellComponents: `${SpellCompendium5e.SYSTEM}.${SpellCompendium5e.Spell}Components`,
+        spellTags: `${SpellCompendium5e.Spell} Tags`,
+        damage: `${SpellCompendium5e.SYSTEM}.Damage`,
+        itemName: `${SpellCompendium5e.SYSTEM}.ItemName`,
+        duration: `${SpellCompendium5e.SYSTEM}.Duration`,
+      },
     }
 
     const element = await renderTemplate(SpellCompendium5e.TEMPLATES.filters, {
@@ -325,7 +351,7 @@ export class SpellCompendium5eCompendium {
       const itemId = listItemElement.dataset.documentId;
       const relevantIndexEntry = this.newIndex.get(itemId);
 
-      if (relevantIndexEntry.type !== 'spell') {
+      if (relevantIndexEntry.type !== SpellCompendium5e.spell) {
         return;
       }
 
@@ -355,7 +381,7 @@ export class SpellCompendium5eCompendium {
       const indexWithoutFolders = app.collection.index.filter(({ name }) => name !== '#[CF_tempEntity]');
 
       const hasNotSpell = !indexWithoutFolders.length ||
-        indexWithoutFolders.some(({ type }) => type !== 'spell');
+        indexWithoutFolders.some(({ type }) => type !== SpellCompendium5e.spell);
 
       // abort if this is not a compendium with only spells
       if (hasNotSpell) {

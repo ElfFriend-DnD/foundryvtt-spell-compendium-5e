@@ -14,6 +14,20 @@ export class SpellCompendium5e {
       console.log(this.MODULE_TITLE, '|', ...args);
     }
   }
+
+  static get system() { return game.system.id; }
+  static get SYSTEM() { return game.system.id.toUpperCase(); }
+  static get CONFIG() { return CONFIG[this.SYSTEM]; }
+  static get spell() {
+    if (this.system === "sw5e") return 'power';
+    return 'spell';
+  }
+  static get Spell() {
+    if (this.system === "sw5e") return 'Power';
+    return 'Spell';
+  }
+  static spellAttr(attr) { return `${this.spell}${attr}`; }
+  static SPELLCONFIG(attr) { return this.CONFIG[this.spellAttr(attr)]; }
 }
 
 Hooks.on("ready", async () => {

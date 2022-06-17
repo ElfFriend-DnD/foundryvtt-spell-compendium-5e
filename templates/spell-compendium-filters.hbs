@@ -1,6 +1,6 @@
   <form class="filters">
     <fieldset>
-      <legend>{{localize 'DND5E.SpellLevel'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <legend>{{localize config.localize.spellLevel}} ({{localize 'spell-compendium-5e.OR'}})</legend>
       <div class="filter-grid">
         {{#each config.spellLevels as | label lvl |}}
         <label>
@@ -12,7 +12,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>{{localize 'DND5E.SpellSchool'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <legend>{{localize config.localize.spellSchool}} ({{localize 'spell-compendium-5e.OR'}})</legend>
       <div class="filter-grid">
         {{#each config.spellSchools as | label abbrev |}}
         <label>
@@ -24,7 +24,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>{{localize 'DND5E.ItemActivationCost'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <legend>{{localize config.localize.itemActivationCost}} ({{localize 'spell-compendium-5e.OR'}})</legend>
       <div class="filter-grid">
         {{#each config.spellActivationTypes as | label abbrev |}}
         <label>
@@ -37,7 +37,7 @@
     </fieldset>
 
     <!--<fieldset>
-  <legend>{{localize 'DND5E.SpellComponents'}}</legend>
+  <legend>{{localize config.localize.spellComponents}}</legend>
   {{#each config.spellComponentTypes as | label type |}}
     <label>
       <input type="checkbox" name="components.{{type}}" {{checked (lookup @root/inputs.components type)}}>
@@ -47,7 +47,7 @@
   </fieldset>-->
 
     <fieldset>
-      <legend>{{localize 'Spell Tags'}} ({{localize 'spell-compendium-5e.AND'}})</legend>
+      <legend>{{localize config.localize.spellTags}} ({{localize 'spell-compendium-5e.AND'}})</legend>
       <div class="filter-grid">
         {{#each config.spellTagTypes as | label type |}}
         <label>
@@ -59,7 +59,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>{{localize 'DND5E.Damage'}} ({{localize 'spell-compendium-5e.OR'}})</legend>
+      <legend>{{localize config.localize.damage}} ({{localize 'spell-compendium-5e.OR'}})</legend>
       <div class="filter-grid">
         {{#each config.damageTypes as | label type |}}
         <label>
